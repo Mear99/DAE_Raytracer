@@ -41,18 +41,15 @@ void Renderer::Render(Scene* pScene) const
 			Ray hitRay{ {0,0,0}, rayDirection };
 
 			ColorRGB finalColor{};
-			HitRecord closesteHit{};
+			HitRecord closestHit{};
 
-			pScene->GetClosestHit(hitRay, closesteHit);
+			pScene->GetClosestHit(hitRay, closestHit);
 
-			if (closesteHit.didHit) {
+			if (closestHit.didHit) {
 
 				// Material color
-				finalColor = materials[closesteHit.materialIndex]->Shade();
+				finalColor = materials[closestHit.materialIndex]->Shade();
 
-				// Check t-values
-				//const float scaledT = (closesteHit.t - 50.0f) / 40.0f;
-				//finalColor = { scaledT, scaledT, scaledT };
 			}
 
 			//Update Color in Buffer

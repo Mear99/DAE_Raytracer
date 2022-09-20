@@ -36,6 +36,13 @@ namespace dae {
 				closestHit = tempHit;
 			}
 		}
+
+		for (const Plane& plane : m_PlaneGeometries) {
+			GeometryUtils::HitTest_Plane(plane, ray, tempHit);
+			if (tempHit.t < closestHit.t) {
+				closestHit = tempHit;
+			}
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const

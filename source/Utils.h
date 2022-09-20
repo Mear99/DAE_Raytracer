@@ -31,6 +31,8 @@ namespace dae
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex;
 				hitRecord.t = distance;
+				
+				return true;
 			}
 
 			return false;
@@ -46,8 +48,20 @@ namespace dae
 		//PLANE HIT-TESTS
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
+			float t = Vector3::Dot(plane.origin - ray.origin, plane.normal) / Vector3::Dot(ray.direction, plane.normal);
+
+			if (t >= ray.min && t <= ray.max) {
+				if (ignoreHitRecord) {
+					return true;
+				}
+
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = plane.materialIndex;
+				hitRecord.t = t;
+
+				return true;
+			}
+
 			return false;
 		}
 
