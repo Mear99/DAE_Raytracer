@@ -33,14 +33,28 @@ void Renderer::Render(Scene* pScene) const
 		{
 
 			Vector3 rayDirection{};
-			rayDirection.x = ((2 * (px + 0.5f) / m_Width) - 1) * (m_Width / m_Height);
+			rayDirection.x = ((2 * (px + 0.5f) / m_Width) - 1) * (float(m_Width) / m_Height);
 			rayDirection.y = (1 - (2 * (py + 0.5f) / m_Height));
 			rayDirection.z = 1;
 			rayDirection.Normalize();
 
 			Ray hitRay{ {0,0,0}, rayDirection };
 
-			ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
+			ColorRGB finalColor{};
+			HitRecord closesteHit{};
+			Sphere testSphere{ {0.0f,0.0f,100.0f}, 50.0f, 0 };
+
+			GeometryUtils::HitTest_Sphere(testSphere, hitRay, closesteHit);
+
+			if (closesteHit.didHit) {
+
+				// Material color
+				//finalColor = materials[closesteHit.materialIndex]->Shade();
+
+				// Check t-values
+				const float scaledT = (closesteHit.t - 50.0f) / 40.0f;
+				finalColor = { scaledT, scaledT, scaledT };
+			}
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();

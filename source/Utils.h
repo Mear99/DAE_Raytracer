@@ -12,8 +12,27 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
+			// hypothenuse
+			Vector3 L{ sphere.origin - ray.origin };
+			// adjacent side
+			float tca{ Vector3::Dot(L, ray.direction) };
+			// opposite side squared
+			float odSqrd{ L.SqrMagnitude() - tca*tca };
+			
+			if (odSqrd < sphere.radius * sphere.radius) {
+				
+				if (ignoreHitRecord) {
+					return true;
+				}
+
+				float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
+				float distance{ tca - thc };
+
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.t = distance;
+			}
+
 			return false;
 		}
 
