@@ -31,11 +31,16 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float gradient = px / static_cast<float>(m_Width);
-			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;
 
-			ColorRGB finalColor{ gradient, gradient, gradient };
+			Vector3 rayDirection{};
+			rayDirection.x = ((2 * (px + 0.5f) / m_Width) - 1) * (m_Width / m_Height);
+			rayDirection.y = (1 - (2 * (py + 0.5f) / m_Height));
+			rayDirection.z = 1;
+			rayDirection.Normalize();
+
+			Ray hitRay{ {0,0,0}, rayDirection };
+
+			ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
@@ -44,6 +49,7 @@ void Renderer::Render(Scene* pScene) const
 				static_cast<uint8_t>(finalColor.r * 255),
 				static_cast<uint8_t>(finalColor.g * 255),
 				static_cast<uint8_t>(finalColor.b * 255));
+
 		}
 	}
 
