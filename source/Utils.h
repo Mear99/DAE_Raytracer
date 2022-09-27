@@ -19,7 +19,7 @@ namespace dae
 			// opposite side squared
 			float odSqrd{ L.SqrMagnitude() - tca*tca };
 			
-			if (odSqrd < sphere.radius * sphere.radius) {
+			if (odSqrd <= sphere.radius * sphere.radius) {
 				
 				if (ignoreHitRecord) {
 					return true;
