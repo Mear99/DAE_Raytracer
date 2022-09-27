@@ -30,6 +30,7 @@ void Renderer::Render(Scene* pScene) const
 	const float aspectRatio{ float(m_Width) / m_Height };
 	const float fov{ tanf(camera.fovAngle * TO_RADIANS/2) };
 	const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
+	const float lightCheckOffset{ 0.001f };
 
 	for (int px{}; px < m_Width; ++px)
 	{
@@ -55,6 +56,20 @@ void Renderer::Render(Scene* pScene) const
 
 				// Material color
 				finalColor = materials[closestHit.materialIndex]->Shade();
+
+				// Hard shadows
+				for (const Light& light : lights) {
+
+					Vector3 startPoint{ closestHit.origin + closestHit.normal * lightCheckOffset };
+					Vector3 toLightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin)};
+
+					Ray toLight{ startPoint, toLightDirection.Normalized()};
+					toLight.max = toLightDirection.Magnitude();
+
+					if (pScene->DoesHit(toLight)) {
+						finalColor *= 0.5f;
+					}
+				}
 
 			}
 

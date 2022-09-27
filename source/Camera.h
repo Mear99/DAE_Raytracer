@@ -22,8 +22,7 @@ namespace dae
 		Vector3 origin{};
 		float fovAngle{90.f};
 
-		//Vector3 forward{Vector3::UnitZ};
-		Vector3 forward{0.266f,-0.453f,0.860f};
+		Vector3 forward{Vector3::UnitZ};
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
@@ -31,6 +30,9 @@ namespace dae
 		float totalYaw{0.f};
 
 		Matrix cameraToWorld{};
+
+		const float movementSpeed{ 10 };
+		const float rotationSpeed{ 5*TO_RADIANS };
 
 
 		Matrix CalculateCameraToWorld()
@@ -49,13 +51,60 @@ namespace dae
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
+			//WASD movement
+			if (pKeyboardState[SDL_SCANCODE_W]) {
+				origin += pTimer->GetElapsed()*movementSpeed * forward;
+			}
+			if (pKeyboardState[SDL_SCANCODE_S]) {
+				origin -= pTimer->GetElapsed() * movementSpeed * forward;
+			}
+
+			if (pKeyboardState[SDL_SCANCODE_D]) {
+				origin += pTimer->GetElapsed() * movementSpeed * right;
+			}
+			if (pKeyboardState[SDL_SCANCODE_A]) {
+				origin -= pTimer->GetElapsed() * movementSpeed * right;
+			}
+
+
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-			//todo: W2
-			//assert(false && "Not Implemented Yet");
+			if ((SDL_BUTTON(1) & mouseState) != 0 && (SDL_BUTTON(3) & mouseState) != 0) {
+				if (mouseY != 0) {
+					origin -= pTimer->GetElapsed() * movementSpeed * up * (float(mouseY) / abs(mouseY));
+				}
+			}
+
+			else if ((SDL_BUTTON(1) & mouseState) != 0) {
+				totalYaw -= mouseX * rotationSpeed * pTimer->GetElapsed();
+
+				if (mouseY != 0) {
+					origin -= pTimer->GetElapsed() * movementSpeed * forward * (float(mouseY) / abs(mouseY));
+				}
+			}
+
+			else if ((SDL_BUTTON(3) & mouseState) != 0) {
+				totalYaw -= mouseX * rotationSpeed * pTimer->GetElapsed();
+				totalPitch -= mouseY * rotationSpeed * pTimer->GetElapsed();
+			}
+
+			if (pKeyboardState[SDL_SCANCODE_F4]) {
+
+				if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+					SDL_SetRelativeMouseMode(SDL_FALSE);
+				}
+				else {
+					SDL_SetRelativeMouseMode(SDL_TRUE);
+				}
+			}
+
+
+			Matrix totalRotation{ Matrix::CreateRotation(totalPitch,totalYaw,0) };
+			forward = totalRotation.TransformVector(Vector3::UnitZ);
+			forward.Normalize();
 		}
 	};
 }

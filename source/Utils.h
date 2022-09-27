@@ -12,30 +12,66 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			// hypothenuse
+			// Analytic solution
+			Vector3 L{ray.origin - sphere.origin};
+			float a = ray.direction.SqrMagnitude();
+			float b = Vector3::Dot(2*ray.direction,L);
+			float c = L.SqrMagnitude() - (sphere.radius*sphere.radius);
+
+			float discriminant{ b * b - 4 * a * c };
+			if (discriminant > 0) {
+
+				float t = (-b - sqrt(discriminant)) / (2 * a);
+				if (t < ray.min) {
+					t = (-b + sqrt(discriminant)) / (2 * a);
+					if (t < ray.min) {
+						return false;
+					}
+				}
+
+				if (ignoreHitRecord) {
+					return true;
+				}
+
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.t = t;
+				hitRecord.origin = ray.origin + ray.direction * t;
+				hitRecord.normal = hitRecord.origin - sphere.origin;
+
+				return true;
+			}
+			return false;
+
+			// Geometric Solution
+			/*// hypothenuse
 			Vector3 L{ sphere.origin - ray.origin };
 			// adjacent side
 			float tca{ Vector3::Dot(L, ray.direction) };
 			// opposite side squared
 			float odSqrd{ L.SqrMagnitude() - tca*tca };
 			
-			if (odSqrd <= sphere.radius * sphere.radius) {
+			if (odSqrd < sphere.radius * sphere.radius) {
 				
 				if (ignoreHitRecord) {
 					return true;
 				}
 
 				float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
-				float distance{ tca - thc };
+				float t{ tca - thc };
+				if (t < ray.min) {
+					t = tca + thc;
+				}
 
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.t = distance;
+				hitRecord.t = t;
+				hitRecord.origin = ray.origin + ray.direction * t;
 				
 				return true;
 			}
 
-			return false;
+			return false;*/
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -58,6 +94,8 @@ namespace dae
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex;
 				hitRecord.t = t;
+				hitRecord.origin = ray.origin + ray.direction * t;
+				hitRecord.normal = plane.normal;
 
 				return true;
 			}
@@ -107,9 +145,7 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			return {light.origin - origin};
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
