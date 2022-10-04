@@ -58,7 +58,7 @@ void Renderer::Render(Scene* pScene) const
 				finalColor = materials[closestHit.materialIndex]->Shade();
 
 				// Hard shadows
-				for (const Light& light : lights) {
+				/*for (const Light& light : lights) {
 
 					Vector3 startPoint{ closestHit.origin + closestHit.normal * lightCheckOffset };
 					Vector3 toLightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin)};
@@ -69,7 +69,7 @@ void Renderer::Render(Scene* pScene) const
 					if (pScene->DoesHit(toLight)) {
 						finalColor *= 0.5f;
 					}
-				}
+				}*/
 
 			}
 

@@ -24,7 +24,7 @@ namespace dae
 				float t = (-b - sqrt(discriminant)) / (2 * a);
 				if (t < ray.min) {
 					t = (-b + sqrt(discriminant)) / (2 * a);
-					if (t < ray.min) {
+					if (t < ray.min || t > ray.max) {
 						return false;
 					}
 				}
@@ -44,34 +44,37 @@ namespace dae
 			return false;
 
 			// Geometric Solution
-			/*// hypothenuse
-			Vector3 L{ sphere.origin - ray.origin };
-			// adjacent side
-			float tca{ Vector3::Dot(L, ray.direction) };
-			// opposite side squared
-			float odSqrd{ L.SqrMagnitude() - tca*tca };
-			
-			if (odSqrd < sphere.radius * sphere.radius) {
-				
-				if (ignoreHitRecord) {
-					return true;
-				}
+			// hypothenuse
+			//Vector3 L{sphere.origin - ray.origin};
+			//// adjacent side
+			//float tca{ Vector3::Dot(L, ray.direction) };
+			//// opposite side squared
+			//float odSqrd{ L.SqrMagnitude() - tca*tca };
+			//
+			//if (odSqrd <= sphere.radius * sphere.radius) {
+			//	
+			//	float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
+			//	float t{ tca - thc };
+			//	if (t < ray.min) {
+			//		t = tca + thc;
+			//		if (t < ray.min || t > ray.max) {
+			//			return false;
+			//		}
+			//	}
 
-				float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
-				float t{ tca - thc };
-				if (t < ray.min) {
-					t = tca + thc;
-				}
+			//	if (ignoreHitRecord) {
+			//		return true;
+			//	}
 
-				hitRecord.didHit = true;
-				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.t = t;
-				hitRecord.origin = ray.origin + ray.direction * t;
-				
-				return true;
-			}
-
-			return false;*/
+			//	hitRecord.didHit = true;
+			//	hitRecord.materialIndex = sphere.materialIndex;
+			//	hitRecord.t = t;
+			//	hitRecord.origin = ray.origin + ray.direction * t;
+			//	hitRecord.normal = hitRecord.origin - sphere.origin;
+			//	
+			//	return true;
+			//}
+			//return false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)

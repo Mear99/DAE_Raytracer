@@ -91,17 +91,6 @@ namespace dae
 				totalPitch -= mouseY * rotationSpeed * pTimer->GetElapsed();
 			}
 
-			if (pKeyboardState[SDL_SCANCODE_F4]) {
-
-				if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
-					SDL_SetRelativeMouseMode(SDL_FALSE);
-				}
-				else {
-					SDL_SetRelativeMouseMode(SDL_TRUE);
-				}
-			}
-
-
 			Matrix totalRotation{ Matrix::CreateRotation(totalPitch,totalYaw,0) };
 			forward = totalRotation.TransformVector(Vector3::UnitZ);
 			forward.Normalize();
