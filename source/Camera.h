@@ -38,7 +38,7 @@ namespace dae
 		Matrix CalculateCameraToWorld()
 		{
 			Vector3 worldUp{ 0,1,0 };
-			right = Vector3::Cross(worldUp, forward);
+			right = Vector3::Cross(worldUp, forward).Normalized();
 			up = Vector3::Cross(forward, right);
 
 			return Matrix{right, up, forward, origin};

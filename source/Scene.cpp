@@ -184,4 +184,65 @@ namespace dae {
 		
 	}
 #pragma endregion
+
+#pragma region SCENE W3
+	void Scene_W3_TestScene::Initialize() {
+		m_Camera.origin = { 0.0f,1.0f,-5.0f };
+		m_Camera.fovAngle = 45.0f;
+
+		//default: Material id0 >> SolidColor Material (RED)
+		const unsigned char matId_Solid_Red = AddMaterial(new Material_Lambert{ colors::Red,1.0f });
+		const unsigned char matId_Solid_Blue = AddMaterial(new Material_LambertPhong{ colors::Blue,1.0f, 1.0f, 60.0f });
+		const unsigned char matId_Solid_Yellow = AddMaterial(new Material_Lambert{ colors::Yellow,1.0f });
+
+		//Plane
+		AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f,0.f }, matId_Solid_Yellow);
+
+		//Spheres
+		AddSphere({ -.75f, 1.f, 0.f }, 1.f, matId_Solid_Red);
+		AddSphere({ 0.75f, 1.f, 0.f }, 1.f, matId_Solid_Blue);
+
+		//Lights
+		AddPointLight({ 0.f,5.f,5.f }, 25.f, colors::White);
+		AddPointLight({ 0.f,2.5f,-5.f }, 25.f, colors::White);
+
+	}
+
+	void Scene_W3::Initialize() {
+		m_Camera.origin = { 0.0f,3.0f,-9.0f };
+		m_Camera.fovAngle = 45.0f;
+
+		//default: Material id0 >> SolidColor Material (RED)
+		const auto matCT_GrayRoughMetal = AddMaterial(new Material_CookTorrence({ 0.972f,0.96f,0.915f }, 1.0f, 1.0f));
+		const auto matCT_GrayMediumMetal = AddMaterial(new Material_CookTorrence({ 0.972f,0.96f,0.915f }, 1.0f, 0.6f));
+		const auto matCT_GraySmoothMetal = AddMaterial(new Material_CookTorrence({ 0.972f,0.96f,0.915f }, 1.0f, 0.1f));
+		const auto matCT_GrayRoughPlastic = AddMaterial(new Material_CookTorrence({ 0.75f,0.75f,0.75f }, 0.0f, 1.0f));
+		const auto matCT_GrayMediumPlastic = AddMaterial(new Material_CookTorrence({ 0.75f,0.75f,0.75f }, 0.0f, 0.6f));
+		const auto matCT_GraySmoothPlastic = AddMaterial(new Material_CookTorrence({ 0.75f,0.75f,0.75f }, 0.0f, 0.1f));
+
+		const auto matLambert_GrayBlue = AddMaterial(new Material_Lambert({ 0.49f,0.57f,0.57f }, 1.0f));
+
+		//Plane
+		AddPlane({ 0.f, 0.f, 10.f }, { 0.f, 0.f,-1.f }, matLambert_GrayBlue);
+		AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f,0.f }, matLambert_GrayBlue);
+		AddPlane({ 0.f, 10.f, 0.f }, { 0.f,-1.f,0.f }, matLambert_GrayBlue);
+		AddPlane({ 5.f, 0.f, 0.f }, { -1.f, 0.f,0.f }, matLambert_GrayBlue);
+		AddPlane({ -5.f, 0.f, 0.f }, { 1.f, 0.f,0.f }, matLambert_GrayBlue);
+
+		//Spheres
+		AddSphere({ -1.75f, 1.f, 0.f }, 0.75f, matCT_GrayRoughMetal);
+		AddSphere({ 0.f, 1.f, 0.f }, 0.75f, matCT_GrayMediumMetal);
+		AddSphere({ 1.75f, 1.f, 0.f }, 0.75f, matCT_GraySmoothMetal);
+		AddSphere({ -1.75f, 3.f, 0.f }, 0.75f, matCT_GrayRoughPlastic);
+		AddSphere({ 0.f, 3.f, 0.f }, 0.75f, matCT_GrayMediumPlastic);
+		AddSphere({ 1.75f, 3.f, 0.f }, 0.75f, matCT_GraySmoothPlastic);
+
+		//Lights
+		AddPointLight({ 0.f,5.f,5.f }, 50.f, ColorRGB{ 1.0f,0.61f,0.45f });
+		AddPointLight({ -2.5f,5.f,-5.f }, 70.f, ColorRGB{ 1.0f,0.8f,0.45f });
+		AddPointLight({ 2.5f,2.5f,-5.f }, 50.f, ColorRGB{ 0.34f,0.47f,0.68f });
+
+	}
+
+#pragma endregion
 }

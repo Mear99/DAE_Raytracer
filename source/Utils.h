@@ -13,50 +13,17 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			// Analytic solution
-			Vector3 L{ray.origin - sphere.origin};
-			float a = ray.direction.SqrMagnitude();
-			float b = Vector3::Dot(2*ray.direction,L);
-			float c = L.SqrMagnitude() - (sphere.radius*sphere.radius);
+			//Vector3 L{ray.origin - sphere.origin};
+			//float a = ray.direction.SqrMagnitude();
+			//float b = Vector3::Dot(2*ray.direction,L);
+			//float c = L.SqrMagnitude() - (sphere.radius*sphere.radius);
 
-			float discriminant{ b * b - 4 * a * c };
-			if (discriminant > 0) {
+			//float discriminant{ b * b - 4 * a * c };
+			//if (discriminant > 0) {
 
-				float t = (-b - sqrt(discriminant)) / (2 * a);
-				if (t < ray.min) {
-					t = (-b + sqrt(discriminant)) / (2 * a);
-					if (t < ray.min || t > ray.max) {
-						return false;
-					}
-				}
-
-				if (ignoreHitRecord) {
-					return true;
-				}
-
-				hitRecord.didHit = true;
-				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.t = t;
-				hitRecord.origin = ray.origin + ray.direction * t;
-				hitRecord.normal = hitRecord.origin - sphere.origin;
-
-				return true;
-			}
-			return false;
-
-			// Geometric Solution
-			// hypothenuse
-			//Vector3 L{sphere.origin - ray.origin};
-			//// adjacent side
-			//float tca{ Vector3::Dot(L, ray.direction) };
-			//// opposite side squared
-			//float odSqrd{ L.SqrMagnitude() - tca*tca };
-			//
-			//if (odSqrd <= sphere.radius * sphere.radius) {
-			//	
-			//	float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
-			//	float t{ tca - thc };
-			//	if (t < ray.min) {
-			//		t = tca + thc;
+			//	float t = (-b - sqrt(discriminant)) / (2 * a);
+			//	if (t < ray.min || t > ray.max) {
+			//		t = (-b + sqrt(discriminant)) / (2 * a);
 			//		if (t < ray.min || t > ray.max) {
 			//			return false;
 			//		}
@@ -71,10 +38,43 @@ namespace dae
 			//	hitRecord.t = t;
 			//	hitRecord.origin = ray.origin + ray.direction * t;
 			//	hitRecord.normal = hitRecord.origin - sphere.origin;
-			//	
+
 			//	return true;
 			//}
 			//return false;
+
+			// Geometric Solution
+			// hypothenuse
+			Vector3 L{sphere.origin - ray.origin};
+			// adjacent side
+			float tca{ Vector3::Dot(L, ray.direction) };
+			// opposite side squared
+			float odSqrd{ L.SqrMagnitude() - tca*tca };
+			
+			if (odSqrd <= sphere.radius * sphere.radius) {
+				
+				float thc{ sqrtf(sphere.radius * sphere.radius - odSqrd) };
+				float t{ tca - thc };
+				if (t < ray.min || t > ray.max) {
+					t = tca + thc;
+					if (t < ray.min || t > ray.max) {
+						return false;
+					}
+				}
+
+				if (ignoreHitRecord) {
+					return true;
+				}
+
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.t = t;
+				hitRecord.origin = ray.origin + ray.direction * t;
+				hitRecord.normal = hitRecord.origin - sphere.origin;
+				
+				return true;
+			}
+			return false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -153,9 +153,16 @@ namespace dae
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			Vector3 lightDirection{ GetDirectionToLight(light, target) };
+
+			switch (light.type) {
+			case LightType::Point:
+				return (light.color * light.intensity) / (lightDirection.SqrMagnitude());
+				break;
+			case LightType::Directional:
+				return (light.color * light.intensity);
+				break;
+			}
 		}
 	}
 

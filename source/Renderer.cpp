@@ -47,7 +47,7 @@ void Renderer::Render(Scene* pScene) const
 
 			Ray hitRay{ camera.origin, rayDirection };
 
-			ColorRGB finalColor{};
+			ColorRGB finalColor{0,0,0};
 			HitRecord closestHit{};
 
 			pScene->GetClosestHit(hitRay, closestHit);
@@ -55,22 +55,56 @@ void Renderer::Render(Scene* pScene) const
 			if (closestHit.didHit) {
 
 				// Material color
-				finalColor = materials[closestHit.materialIndex]->Shade();
+				for (const Light& light : lights) {
 
-				// Hard shadows
-				/*for (const Light& light : lights) {
+					// Vector from hit to light
+					Vector3 toLightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin) };
+					toLightDirection.Normalize();
 
-					Vector3 startPoint{ closestHit.origin + closestHit.normal * lightCheckOffset };
-					Vector3 toLightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin)};
-
-					Ray toLight{ startPoint, toLightDirection.Normalized()};
-					toLight.max = toLightDirection.Magnitude();
-
-					if (pScene->DoesHit(toLight)) {
-						finalColor *= 0.5f;
+					// Incoming light direction (depends on light type)
+					Vector3 lightDirection{ light.direction };
+					if (light.type == LightType::Point) {
+						lightDirection = toLightDirection;
 					}
-				}*/
 
+					// Cosine Law
+					float cosineLaw{ Vector3::Dot(closestHit.normal, lightDirection) };
+
+					// Light hits the surface
+					if (cosineLaw > 0) {
+
+						// Illumination is direct (so nothing between surface and light) or shadows are ignored
+						Vector3 startPoint{ closestHit.origin + closestHit.normal * lightCheckOffset };
+						Ray toLight{ startPoint, toLightDirection };
+						toLight.max = toLightDirection.Magnitude();
+						if (!pScene->DoesHit(toLight) || !m_ShadowsEnabled) {
+
+							// Radiance
+							ColorRGB radiance{ LightUtils::GetRadiance(light,closestHit.origin) };
+
+							// BRDF color
+							ColorRGB BRDFColor{ materials[closestHit.materialIndex]->Shade(closestHit, toLightDirection, hitRay.direction) };
+
+							switch (m_CurrentLightingMode) {
+								case LightingMode::ObservedArea:
+									finalColor += ColorRGB{ cosineLaw, cosineLaw, cosineLaw };
+									break;
+
+								case LightingMode::Radiance:
+									finalColor += radiance;
+									break;
+
+								case LightingMode::BRDF:
+									finalColor += BRDFColor;
+									break;
+
+								case LightingMode::Combined:
+									finalColor += radiance * BRDFColor * cosineLaw;
+									break;
+							}
+						}
+					}
+				}
 			}
 
 			//Update Color in Buffer
@@ -92,4 +126,8 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void Renderer::CycleLightingMode() {
+	m_CurrentLightingMode = LightingMode((int(m_CurrentLightingMode) + 1)%4);
 }
