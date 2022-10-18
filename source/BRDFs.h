@@ -32,8 +32,9 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			Vector3 reflect{ l - 2 * (Vector3::Dot(n,l) * n) };
-			float cosine{ Vector3::Dot(reflect,v) };
+			float dotproduct{ std::max(Vector3::Dot(n,l),0.0f) };
+			Vector3 r{ l - 2 * (dotproduct * n) };
+			float cosine{ std::max(Vector3::Dot(r,v),0.0f) };
 			float PhongSpecular{ ks * powf(cosine,exp) };
 
 			return ColorRGB{PhongSpecular, PhongSpecular, PhongSpecular};
@@ -49,7 +50,7 @@ namespace dae
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
 
-			return {};
+			return f0 + (ColorRGB{1,1,1} - f0) * powf((1 - Vector3::Dot(h, v)), 5);
 		}
 
 		/**
@@ -61,7 +62,10 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			return {};
+			float alphaSqrd{ powf(roughness,4) };
+			float SqrdDot{ powf(Vector3::Dot(n, h),2) };
+			float SqrdTerm{powf(SqrdDot*(alphaSqrd-1)+1,2)};
+			return alphaSqrd / (PI * SqrdTerm);
 		}
 
 
@@ -74,8 +78,11 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
+			float k{ powf((roughness * roughness + 1),2) / 8 };
+			float dotProduct{ Vector3::Dot(n,v) };
 
-			return {};
+			return dotProduct / (dotProduct * (1 - k) + k);
+			
 		}
 
 		/**
@@ -88,7 +95,7 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			return {};
+			return GeometryFunction_SchlickGGX(n,v,roughness)*GeometryFunction_SchlickGGX(n,l,roughness);
 		}
 
 	}

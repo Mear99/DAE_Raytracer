@@ -82,7 +82,7 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, v, hitRecord.normal);
 		}
 
 	private:
@@ -105,7 +105,24 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			return {};
+			// l is towards light, so I adjusted the formulas to work with that
+			// => -l 
+
+			ColorRGB f0{};
+			f0 = (m_Metalness == 0) ? ColorRGB{0.04f, 0.04f, 0.04f} : m_Albedo;
+			Vector3 halfVector{ (v - l) / (v - l).Magnitude() };
+			ColorRGB Fresnel{ BRDF::FresnelFunction_Schlick(halfVector,v,f0) };
+			float Distribution{ BRDF::NormalDistribution_GGX(hitRecord.normal,halfVector,m_Roughness) };
+			//????
+			float Geometry{ BRDF::GeometryFunction_Smith(hitRecord.normal,-v,l,m_Roughness) };
+			float inversDenominator{ 1 / (4 * Vector3::Dot(v,hitRecord.normal) * Vector3::Dot(-l,hitRecord.normal)) };
+
+			ColorRGB CookTorrance{ Distribution * Fresnel * Geometry * inversDenominator };
+			ColorRGB kd{};
+			kd = (m_Metalness == 0) ? (ColorRGB{ 1,1,1 } - Fresnel) : ColorRGB{ 0,0,0 };
+			ColorRGB diffuse{ BRDF::Lambert(kd,m_Albedo) };
+
+			return diffuse + CookTorrance;
 		}
 
 	private:

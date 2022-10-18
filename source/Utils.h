@@ -70,7 +70,7 @@ namespace dae
 				hitRecord.materialIndex = sphere.materialIndex;
 				hitRecord.t = t;
 				hitRecord.origin = ray.origin + ray.direction * t;
-				hitRecord.normal = hitRecord.origin - sphere.origin;
+				hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
 				
 				return true;
 			}
@@ -98,7 +98,7 @@ namespace dae
 				hitRecord.materialIndex = plane.materialIndex;
 				hitRecord.t = t;
 				hitRecord.origin = ray.origin + ray.direction * t;
-				hitRecord.normal = plane.normal;
+				hitRecord.normal = plane.normal.Normalized();
 
 				return true;
 			}

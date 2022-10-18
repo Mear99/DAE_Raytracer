@@ -229,6 +229,15 @@ namespace dae {
 		AddPlane({ 5.f, 0.f, 0.f }, { -1.f, 0.f,0.f }, matLambert_GrayBlue);
 		AddPlane({ -5.f, 0.f, 0.f }, { 1.f, 0.f,0.f }, matLambert_GrayBlue);
 
+		// Temp LambertPhong materials
+		//const auto matLambertPhong1 = AddMaterial(new Material_LambertPhong{ colors::Blue,0.5f, 0.5f, 3.0f });
+		//const auto matLambertPhong2 = AddMaterial(new Material_LambertPhong{ colors::Blue,0.5f, 0.5f, 15.0f });
+		//const auto matLambertPhong3 = AddMaterial(new Material_LambertPhong{ colors::Blue,0.5f, 0.5f, 50.0f });
+
+		//AddSphere({ -1.75f, 1.f, 0.f }, 0.75f, matLambertPhong1);
+		//AddSphere({ 0.f, 1.f, 0.f }, 0.75f, matLambertPhong2);
+		//AddSphere({ 1.75f, 1.f, 0.f }, 0.75f, matLambertPhong3);
+
 		//Spheres
 		AddSphere({ -1.75f, 1.f, 0.f }, 0.75f, matCT_GrayRoughMetal);
 		AddSphere({ 0.f, 1.f, 0.f }, 0.75f, matCT_GrayMediumMetal);

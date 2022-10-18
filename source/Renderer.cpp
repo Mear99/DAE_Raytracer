@@ -53,12 +53,11 @@ void Renderer::Render(Scene* pScene) const
 			pScene->GetClosestHit(hitRay, closestHit);
 
 			if (closestHit.didHit) {
-
-				// Material color
 				for (const Light& light : lights) {
 
 					// Vector from hit to light
 					Vector3 toLightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin) };
+					float distanceToLight{ toLightDirection.Magnitude() };
 					toLightDirection.Normalize();
 
 					// Incoming light direction (depends on light type)
@@ -71,12 +70,12 @@ void Renderer::Render(Scene* pScene) const
 					float cosineLaw{ Vector3::Dot(closestHit.normal, lightDirection) };
 
 					// Light hits the surface
-					if (cosineLaw > 0) {
+					if (cosineLaw >= 0) {
 
 						// Illumination is direct (so nothing between surface and light) or shadows are ignored
 						Vector3 startPoint{ closestHit.origin + closestHit.normal * lightCheckOffset };
 						Ray toLight{ startPoint, toLightDirection };
-						toLight.max = toLightDirection.Magnitude();
+						toLight.max = distanceToLight;
 						if (!pScene->DoesHit(toLight) || !m_ShadowsEnabled) {
 
 							// Radiance
