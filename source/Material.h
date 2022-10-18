@@ -20,8 +20,8 @@ namespace dae
 		/**
 		 * \brief Function used to calculate the correct color for the specific material and its parameters
 		 * \param hitRecord current hitrecord
-		 * \param l light direction
-		 * \param v view direction
+		 * \param l light direction from hitpoint to light
+		 * \param v view direction from hitpoint to viewer
 		 * \return color
 		 */
 		virtual ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) = 0;
@@ -82,7 +82,7 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, v, hitRecord.normal);
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
 		}
 
 	private:
@@ -103,19 +103,16 @@ namespace dae
 		{
 		}
 
+		// L from hitpoint to light, v from hitpoint to viewer
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			// l is towards light, so I adjusted the formulas to work with that
-			// => -l 
-
 			ColorRGB f0{};
 			f0 = (m_Metalness == 0) ? ColorRGB{0.04f, 0.04f, 0.04f} : m_Albedo;
-			Vector3 halfVector{ (v - l) / (v - l).Magnitude() };
+			Vector3 halfVector{ (v + l) / (v + l).Magnitude() };
 			ColorRGB Fresnel{ BRDF::FresnelFunction_Schlick(halfVector,v,f0) };
 			float Distribution{ BRDF::NormalDistribution_GGX(hitRecord.normal,halfVector,m_Roughness) };
-			//????
-			float Geometry{ BRDF::GeometryFunction_Smith(hitRecord.normal,-v,l,m_Roughness) };
-			float inversDenominator{ 1 / (4 * Vector3::Dot(v,hitRecord.normal) * Vector3::Dot(-l,hitRecord.normal)) };
+			float Geometry{ BRDF::GeometryFunction_Smith(hitRecord.normal,v,l,m_Roughness) };
+			float inversDenominator{ 1 / (4 * Vector3::Dot(v,hitRecord.normal) * Vector3::Dot(l,hitRecord.normal)) };
 
 			ColorRGB CookTorrance{ Distribution * Fresnel * Geometry * inversDenominator };
 			ColorRGB kd{};

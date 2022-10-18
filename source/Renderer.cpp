@@ -82,7 +82,7 @@ void Renderer::Render(Scene* pScene) const
 							ColorRGB radiance{ LightUtils::GetRadiance(light,closestHit.origin) };
 
 							// BRDF color
-							ColorRGB BRDFColor{ materials[closestHit.materialIndex]->Shade(closestHit, toLightDirection, hitRay.direction) };
+							ColorRGB BRDFColor{ materials[closestHit.materialIndex]->Shade(closestHit, toLightDirection, -hitRay.direction) };
 
 							switch (m_CurrentLightingMode) {
 								case LightingMode::ObservedArea:
