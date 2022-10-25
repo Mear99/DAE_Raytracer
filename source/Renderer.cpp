@@ -60,7 +60,7 @@ void Renderer::Render(Scene* pScene) const
 					float distanceToLight{ toLightDirection.Magnitude() };
 					toLightDirection.Normalize();
 
-					// Incoming light direction (depends on light type)
+					// Outgoing light direction (depends on light type)
 					Vector3 lightDirection{ light.direction };
 					if (light.type == LightType::Point) {
 						lightDirection = toLightDirection;
@@ -128,5 +128,5 @@ bool Renderer::SaveBufferToImage() const
 }
 
 void Renderer::CycleLightingMode() {
-	m_CurrentLightingMode = LightingMode((int(m_CurrentLightingMode) + 1)%4);
+	m_CurrentLightingMode = LightingMode((int(m_CurrentLightingMode) + 1) % 4);
 }
