@@ -115,23 +115,23 @@ namespace dae {
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
 		return {	{1,0,0,0},
-					{0,cosf(pitch),sinf(pitch),0},
-					{0,-sinf(pitch),cosf(pitch),0},
+					{0,cosf(pitch),-sinf(pitch),0},
+					{0,sinf(pitch),cosf(pitch),0},
 					{0,0,0,1} };
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		return {	{cosf(yaw), 0,-sinf(yaw),0},
+		return {	{cosf(yaw), 0,sinf(yaw),0},
 					{0,1,0,0},
-					{sinf(yaw),0,cosf(yaw),0},
+					{-sinf(yaw),0,cosf(yaw),0},
 					{0,0,0,1} };
 	}
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
-		return {	{cosf(roll), sinf(roll),0,0},
-					{-sinf(roll),cosf(roll),0,0},
+		return {	{cosf(roll), -sinf(roll),0,0},
+					{sinf(roll),cosf(roll),0,0},
 					{0,0,1,0},
 					{0,0,0,1} };
 	}

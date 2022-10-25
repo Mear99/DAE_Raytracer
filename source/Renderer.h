@@ -1,6 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+#include "Camera.h"
+#include "Material.h"
+#include "DataTypes.h"
 
 struct SDL_Window;
 struct SDL_Surface;
@@ -21,6 +25,8 @@ namespace dae
 		Renderer& operator=(Renderer&&) noexcept = delete;
 
 		void Render(Scene* pScene) const;
+		void RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Camera& camera, const std::vector<Light>& lights, const std::vector<Material*>& materials) const;
+
 		bool SaveBufferToImage() const;
 
 		void ToggleShadows() { m_ShadowsEnabled = !m_ShadowsEnabled; }
