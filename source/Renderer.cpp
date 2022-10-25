@@ -183,4 +183,3 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 		static_cast<uint8_t>(finalColor.b * 255));
 
 }
-

@@ -84,6 +84,11 @@ namespace dae
 		Matrix translationTransform{};
 		Matrix scaleTransform{};
 
+		Vector3 minAABB;
+		Vector3 maxAABB;
+		Vector3 transformedMinAABB;
+		Vector3 transformedMaxAABB;
+
 		std::vector<Vector3> transformedPositions{};
 		std::vector<Vector3> transformedNormals{};
 
@@ -148,12 +153,61 @@ namespace dae
 				transformedPositions.emplace_back(transformMatrix.TransformPoint(vertex));
 			}
 
+			UpdateTransformedAABB(transformMatrix);
+
 			transformedNormals.clear();
 			transformedNormals.reserve(normals.size());
 
 			for (Vector3 normal : normals) {
 				transformedNormals.emplace_back(transformMatrix.TransformVector(normal));
 			}
+		}
+
+		void UpdateAABB() {
+			if (positions.size() > 0) {
+				minAABB = positions[0];
+				maxAABB = positions[0];
+				for (const auto& p : positions) {
+					minAABB = Vector3::Min(minAABB, p);
+					maxAABB = Vector3::Max(maxAABB, p);
+				}
+			}
+		}
+
+		void UpdateTransformedAABB(const Matrix& finalTransform) {
+			Vector3 tMinAABB{ finalTransform.TransformPoint(minAABB) };
+			Vector3 tMaxAABB{ transformedMinAABB };
+
+			Vector3 tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(minAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(maxAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			tAABB = finalTransform.TransformPoint(maxAABB);
+			tMinAABB = Vector3::Min(tMinAABB, tAABB);
+			tMaxAABB = Vector3::Max(tMaxAABB, tAABB);
+
+			transformedMinAABB = tMinAABB;
+			transformedMaxAABB = tMaxAABB;
 		}
 	};
 #pragma endregion
