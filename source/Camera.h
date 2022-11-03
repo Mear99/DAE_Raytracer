@@ -39,7 +39,7 @@ namespace dae
 		{
 			Vector3 worldUp{ 0,1,0 };
 			right = Vector3::Cross(worldUp, forward).Normalized();
-			up = Vector3::Cross(forward, right);
+			up = Vector3::Cross(forward, right); // Cross of two normalizes perpendicular vectors is still a normalized vector
 			cameraToWorld = Matrix{ right, up, forward, origin };
 
 			return cameraToWorld;
@@ -53,17 +53,17 @@ namespace dae
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
 			//WASD movement
-			if (pKeyboardState[SDL_SCANCODE_W]) {
+			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_UP]) {
 				origin += pTimer->GetElapsed()*movementSpeed * forward;
 			}
-			if (pKeyboardState[SDL_SCANCODE_S]) {
+			if (pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_DOWN]) {
 				origin -= pTimer->GetElapsed() * movementSpeed * forward;
 			}
 
-			if (pKeyboardState[SDL_SCANCODE_D]) {
+			if (pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_RIGHT]) {
 				origin += pTimer->GetElapsed() * movementSpeed * right;
 			}
-			if (pKeyboardState[SDL_SCANCODE_A]) {
+			if (pKeyboardState[SDL_SCANCODE_A] || pKeyboardState[SDL_SCANCODE_LEFT]) {
 				origin -= pTimer->GetElapsed() * movementSpeed * right;
 			}
 
