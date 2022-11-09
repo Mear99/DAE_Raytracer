@@ -69,6 +69,14 @@ int main(int argc, char* args[])
 				if(e.key.keysym.scancode == SDL_SCANCODE_X)
 					takeScreenshot = true;
 
+				if (e.key.keysym.scancode == SDL_SCANCODE_F2) {
+					pRenderer->ToggleShadows();
+				}
+
+				if (e.key.keysym.scancode == SDL_SCANCODE_F3) {
+					pRenderer->CycleLightingMode();
+				}
+
 				if (e.key.keysym.scancode == SDL_SCANCODE_F4) {
 
 					if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
@@ -79,13 +87,10 @@ int main(int argc, char* args[])
 					}
 				}
 
-				if (e.key.keysym.scancode == SDL_SCANCODE_F2) {
-					pRenderer->ToggleShadows();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6) {
+					pTimer->StartBenchmark();
 				}
 
-				if (e.key.keysym.scancode == SDL_SCANCODE_F3) {
-					pRenderer->CycleLightingMode();
-				}
 				break;
 			}
 		}
